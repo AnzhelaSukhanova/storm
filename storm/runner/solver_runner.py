@@ -29,6 +29,8 @@ def solver_runner(solver_path, smt_file, temp_core_folder, timeout, incremental,
 
     if solver in ["yices", "cvc4", "boolector"] and incremental == "yes":
         command = "timeout " + str(timeout) + "s " + solver_path + " --incremental " + smt_file + " > " + temp_file_path
+    elif solver == "z3":
+        command = "timeout " + str(timeout) + "s z3 " + smt_file + " > " + temp_file_path
     else:
         command = "timeout " + str(timeout) + "s " + solver_path + " " + smt_file + " > " + temp_file_path
 

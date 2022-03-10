@@ -26,3 +26,6 @@ storm/fse_repl/bug18/mutant_*
 storm/fse_repl/bug19/mutant_*
 storm/fse_repl/bug20/mutant_*
 storm/fse_repl/bug21/mutant_*
+.z3-trace
+Dockerfile
+chc-comp21-benchmarks/*

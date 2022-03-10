@@ -30,7 +30,8 @@ def check_satisfiability(ast, timeout):
     :return: string
     """
     def check_sat(ast, output):
-        sol = Solver()
+        sol = SolverFor('HORN')
+        sol.set('engine', 'spacer')
         sol.add(ast)
         satis = sol.check()
         if satis == sat:
@@ -60,7 +61,8 @@ def convert_ast_to_expression(ast):
 
 
 def get_model(ast):
-    s = Solver()
+    s = SolverFor('HORN')
+    s.set('engine', 'spacer')
     s.add(ast)
     satis = s.check()
     if satis != sat:

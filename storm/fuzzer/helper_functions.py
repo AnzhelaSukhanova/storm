@@ -35,7 +35,8 @@ def export_mutants(mutants, path, smt_object, theory):
         for j, assertion in enumerate(ast):
             new_ast.push(assertion)
 
-        s = Solver()
+        s = SolverFor('HORN')
+        s.set('engine', 'spacer')
         s.add(new_ast)
         smt2_string = s.to_smt2()
         print_success_false_string = "(set-option :print-success false)\n"
