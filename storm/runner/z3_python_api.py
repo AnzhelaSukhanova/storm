@@ -19,9 +19,6 @@ from termcolor import colored
 from z3 import *
 
 
-
-
-
 def check_satisfiability(ast, timeout):
     """
 
