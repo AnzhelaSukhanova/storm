@@ -78,7 +78,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
                 if trace_stats.hash:
                     unique_traces.add(trace_stats.hash)
                 else:
-                    log['message'] = 'empty_trace'
+                    log['message'] = 'Empty trace'
                 log['unique_traces'] = len(unique_traces)
                 logging.info(json.dumps(log))
 
@@ -165,7 +165,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
         if trace_stats.hash:
             unique_traces.add(trace_stats.hash)
         else:
-            log['message'] = 'empty_trace'
+            log['message'] = 'Empty trace'
         log['unique_traces'] = len(unique_traces)
         logging.info(json.dumps(log))
 
