@@ -35,17 +35,25 @@ import shutil
 from storm.utils.file_operations import append_row
 import time
 from storm.runner.trace_collection import *
+import logging
+import json
 
 
 unique_traces = set()
 enable_trace('spacer')
+instance_num = 0
+logging.basicConfig(format='%(message)s',
+                    filename='logfile',
+                    filemode='w',
+                    level=logging.INFO)
+
 ALL_FUZZING_PARAMETERS = None
 
 
 def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params):
 
     def run_mutants_in_a_thread(path_to_temp_core_directory, signal, seed_file_number, seed_file_path, incrementality, solver, fuzzing_parameters):
-        global unique_traces
+        global unique_traces, instance_num
 
         mutant_file_paths = get_mutant_paths(path_to_temp_core_directory)
         mutant_file_paths.sort()
@@ -56,6 +64,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
             print("####### RUNNING MUTANTS")
             start_time = time.time()
             for i, mutant_path in enumerate(mutant_file_paths):
+                instance_num += 1
                 trace_stats = TraceStats()
                 reset_trace_offset()
                 output = solver_runner(solver_path=parsedArguments["solverbin"],
@@ -66,6 +75,9 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
                                        solver = solver)
                 trace_stats.read_from_trace()
                 unique_traces.add(trace_stats.hash)
+                logging.info(json.dumps({'number': instance_num,
+                                         'status': 'mutant',
+                                         'unique_traces': len(unique_traces)}))
 
                 print("[" + parsedArguments["solver"] +"]\t"+ "[core: " + str(core) +"]\t", end="")
                 print("[seed_file: " + str(seed_file_number) +"]\t\t" + "[" + str(i+1) + "/" + str(len(mutant_file_paths)) + "]\t\t", end="")
@@ -107,7 +119,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
     create_server_core_directory(temp_directory, parsedArguments["server"], core)
     seed_file_paths = []
 
-    global ALL_FUZZING_PARAMETERS, unique_traces
+    global ALL_FUZZING_PARAMETERS, unique_traces, instance_num
     if not reproduce:
         # normal mode
         ALL_FUZZING_PARAMETERS = get_parameters_dict(replication_mode = False,
@@ -132,6 +144,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
     randomness.shuffle_list(seed_file_paths)
     # run the file and see if it is SAT or UNSAT
     for i, file in enumerate(seed_file_paths):
+        instance_num += 1
         # Refresh core directory
         refresh_directory(path_to_temp_core_directory)
         incrementality = randomness.random_choice(ALL_FUZZING_PARAMETERS["incremental"])
@@ -146,6 +159,10 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
         smt_Object.check_satisfiability(timeout=ALL_FUZZING_PARAMETERS["solver_timeout"])
         trace_stats.read_from_trace()
         unique_traces.add(trace_stats.hash)
+        logging.info(json.dumps({'number': instance_num,
+                                 'status': 'seed',
+                                 'unique_traces': len(unique_traces)}))
+
         print(colored('Unique traces: ' + str(len(unique_traces)), "magenta"))
         if smt_Object.get_orig_satisfiability() == "timeout":
             continue
