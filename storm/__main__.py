@@ -41,6 +41,7 @@ import json
 
 unique_traces = set()
 enable_trace('spacer')
+enable_trace('dl_rule_transf')
 instance_num = 0
 logging.basicConfig(format='%(message)s',
                     filename='logfile',
@@ -74,13 +75,12 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
                                        incremental=incrementality,
                                        solver = solver)
                 trace_stats.read_from_trace()
-                log = {'instance_num': instance_num, 'status': 'mutant'}
                 if trace_stats.hash:
                     unique_traces.add(trace_stats.hash)
-                else:
-                    log['message'] = 'Empty trace'
-                log['unique_traces'] = len(unique_traces)
-                logging.info(json.dumps(log))
+                logging.info(json.dumps({'instance_num': instance_num,
+                                         'status': 'mutant',
+                                         'unique_traces': len(unique_traces),
+                                         'trace': trace_stats.states}))
 
                 print("[" + parsedArguments["solver"] +"]\t"+ "[core: " + str(core) +"]\t", end="")
                 print("[seed_file: " + str(seed_file_number) +"]\t\t" + "[" + str(i+1) + "/" + str(len(mutant_file_paths)) + "]\t\t", end="")
@@ -161,13 +161,12 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
         reset_trace_offset()
         smt_Object.check_satisfiability(timeout=ALL_FUZZING_PARAMETERS["solver_timeout"])
         trace_stats.read_from_trace()
-        log = {'instance_num': instance_num, 'status': 'seed'}
         if trace_stats.hash:
             unique_traces.add(trace_stats.hash)
-        else:
-            log['message'] = 'Empty trace'
-        log['unique_traces'] = len(unique_traces)
-        logging.info(json.dumps(log))
+        logging.info(json.dumps({'instance_num': instance_num,
+                                 'status': 'seed',
+                                 'unique_traces': len(unique_traces)
+                                 'trace': trace_stats.states}))
 
         print(colored('Unique traces: ' + str(len(unique_traces)), "magenta"))
         if smt_Object.get_orig_satisfiability() == "timeout":
