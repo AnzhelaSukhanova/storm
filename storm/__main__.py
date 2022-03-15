@@ -74,8 +74,9 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
                                        incremental=incrementality,
                                        solver = solver)
                 trace_stats.read_from_trace()
-                unique_traces.add(trace_stats.hash)
-                logging.info(json.dumps({'number': instance_num,
+                if trace_stats.hash:
+                    unique_traces.add(trace_stats.hash)
+                logging.info(json.dumps({'instance_num': instance_num,
                                          'status': 'mutant',
                                          'unique_traces': len(unique_traces)}))
 
@@ -158,8 +159,9 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
         reset_trace_offset()
         smt_Object.check_satisfiability(timeout=ALL_FUZZING_PARAMETERS["solver_timeout"])
         trace_stats.read_from_trace()
-        unique_traces.add(trace_stats.hash)
-        logging.info(json.dumps({'number': instance_num,
+        if trace_stats.hash:
+            unique_traces.add(trace_stats.hash)
+        logging.info(json.dumps({'instance_num': instance_num,
                                  'status': 'seed',
                                  'unique_traces': len(unique_traces)}))
 

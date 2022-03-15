@@ -20,7 +20,8 @@ class TraceStats(object):
         with open(TRACE_FILE, 'r') as trace:
             trace.seek(trace_offset)
             lines = trace.readlines()
-        self.load_states(lines)
+        if lines:
+            self.load_states(lines)
 
     def load_states(self, states: list):
         hash_builder = hashlib.sha512()
