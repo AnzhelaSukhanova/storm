@@ -165,7 +165,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
             unique_traces.add(trace_stats.hash)
         logging.info(json.dumps({'instance_num': instance_num,
                                  'status': 'seed',
-                                 'unique_traces': len(unique_traces)
+                                 'unique_traces': len(unique_traces),
                                  'trace': trace_stats.states}))
 
         print(colored('Unique traces: ' + str(len(unique_traces)), "magenta"))
