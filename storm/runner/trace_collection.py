@@ -23,6 +23,9 @@ class State(object):
     def encode(self, standart: str):
         return self.name.encode(standart)
 
+    def save(self):
+        return self.name
+
     @staticmethod
     def load(data) -> 'State':
         state = State('')

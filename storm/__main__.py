@@ -40,8 +40,10 @@ import json
 
 
 unique_traces = set()
+
 enable_trace('spacer')
 enable_trace('dl_rule_transf')
+
 instance_num = 0
 logging.basicConfig(format='%(message)s',
                     filename='logfile',
@@ -80,7 +82,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
                 logging.info(json.dumps({'instance_num': instance_num,
                                          'status': 'mutant',
                                          'unique_traces': len(unique_traces),
-                                         'trace': trace_stats.states}))
+                                         'trace': [state.save() for state in getattr(trace_stats, 'states', [])]}))
 
                 print("[" + parsedArguments["solver"] +"]\t"+ "[core: " + str(core) +"]\t", end="")
                 print("[seed_file: " + str(seed_file_number) +"]\t\t" + "[" + str(i+1) + "/" + str(len(mutant_file_paths)) + "]\t\t", end="")
@@ -166,7 +168,7 @@ def run_storm(parsedArguments, core, SEED, wait, reproduce, rq3, fuzzing_params)
         logging.info(json.dumps({'instance_num': instance_num,
                                  'status': 'seed',
                                  'unique_traces': len(unique_traces),
-                                 'trace': trace_stats.states}))
+                                 'trace': [state.save() for state in getattr(trace_stats, 'states', [])]}))
 
         print(colored('Unique traces: ' + str(len(unique_traces)), "magenta"))
         if smt_Object.get_orig_satisfiability() == "timeout":
